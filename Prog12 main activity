@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F01212"
+    tools:context=".MainActivity">
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="419dp"
+        android:layout_height="59dp"
+        android:foregroundGravity="center"
+        android:gravity="center"
+        android:text="Broadcast Receiver"
+        android:textColor="#FFFFFF"
+        android:textSize="34sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.107" />
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="415dp"
+        android:layout_height="141dp"
+        android:gravity="center"
+        android:padding="5dp"
+        android:text="Conntect or Disconnect the charger cable to see change"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.545"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintVertical_bias="0.496" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+msin activity
+
+
+
+package com.example.prog12;
+
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Bundle;
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+public class MainActivity extends AppCompatActivity {
+    PowerReceiver powRec;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v,
+                                                                            insets) -> {
+            Insets systemBars =
+                    insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right,
+                    systemBars.bottom);
+            return insets;
+        });
+// Create the BroadcastReceiver object
+        powRec = new PowerReceiver();
+        IntentFilter filter = new IntentFilter();
+// Called when charger is connected
+        filter.addAction(Intent.ACTION_POWER_CONNECTED);
+// Called when charger is disconnected
+        filter.addAction(Intent.ACTION_POWER_DISCONNECTED);
+        registerReceiver(powRec, filter);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+// Unregister the receiver when Activity is destroyed.
+        unregisterReceiver(powRec);
+    }
+}
+
+
+
+powerresiver
+
+
+
+
+package com.example.prog12;
+
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.widget.Toast;
+public class PowerReceiver extends BroadcastReceiver {
+    @Override
+    public void onReceive(Context context, Intent intent) {
+// Check which broadcast action was received.
+        if (Intent.ACTION_POWER_CONNECTED.equals(intent.getAction())) {
+            Toast.makeText(context, "Charger Connected",
+                    Toast.LENGTH_SHORT).show();
+        }
+        else if (Intent.ACTION_POWER_DISCONNECTED.equals(intent.getAction())) {
+            Toast.makeText(context, "Charger Disconnected",
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+}
+
+
+
+
+manifet
+
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Prog12">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category
+                    android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <receiver
+            android:name=".PowerReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action
+                    android:name="android.intent.action.ACTION_POWER_CONNECTED" />
+                <action
+                    android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>
